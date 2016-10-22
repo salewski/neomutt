@@ -19,6 +19,7 @@ hcache/hcversion.h
 keymap_alldefs.h
 keymap_defs.h
 mutt
+mutt_launch
 mutt_md5
 pgpewrap
 pgpring
