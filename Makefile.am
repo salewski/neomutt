@@ -36,6 +36,10 @@ if BUILD_PO
 SUBDIRS += po
 endif
 
+if BUILD_UNITTEST
+SUBDIR += unit-test
+endif
+
 bin_SCRIPTS = $(SMIMEAUX_TARGET)
 
 distdir = neo$(PACKAGE)-$(VERSION)
@@ -65,10 +69,10 @@ LIBIMAP = -Limap -limap
 LIBIMAPDEPS = $(top_srcdir)/imap/imap.h imap/libimap.a
 
 mutt_LDADD = $(MUTT_LIB_OBJECTS) $(LIBOBJS) $(HCACHE_LIBS) $(NCRYPT_LIBS) \
-	$(LIBIMAP) $(MUTTLIBS) $(LIBICONV) $(GPGME_LIBS) $(INTLLIBS)
+	$(LIBIMAP) $(MUTTLIBS) $(LIBICONV) $(GPGME_LIBS) $(INTLLIBS) $(LIBUNITTEST)
 
 mutt_DEPENDENCIES = $(MUTT_LIB_OBJECTS) $(LIBOBJS) $(LIBIMAPDEPS) \
-	$(HCACHE_DEPS) $(NCRYPT_DEPS) $(INTLDEPS)
+	$(HCACHE_DEPS) $(NCRYPT_DEPS) $(INTLDEPS) $(LIBUNITTESTDEPS)
 
 DEFS=-DPKGDATADIR=\"$(pkgdatadir)\" -DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DBINDIR=\"$(bindir)\" -DMUTTLOCALEDIR=\"$(datadir)/locale\"
