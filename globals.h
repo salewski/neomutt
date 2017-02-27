@@ -66,6 +66,7 @@ WHERE char *EscChar;
 WHERE char *FolderFormat;
 WHERE char *ForwardAttrIntro;
 WHERE char *ForwardAttrTrailer;
+WHERE char *NetFolderFormat;
 WHERE char *ForwFmt;
 WHERE char *Fqdn;
 WHERE struct MbCharTable *Fromchars;
