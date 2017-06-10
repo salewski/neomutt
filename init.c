@@ -1804,7 +1804,6 @@ static int parse_alias(struct Buffer *buf, struct Buffer *s, unsigned long data,
   mutt_group_context_add_adrlist(gc, tmp->addr);
   mutt_alias_add_reverse(tmp);
 
-#ifdef DEBUG
   if (debuglevel >= 2)
   {
     struct Address *a = NULL;
@@ -1817,7 +1816,6 @@ static int parse_alias(struct Buffer *buf, struct Buffer *s, unsigned long data,
         mutt_debug(3, "parse_alias:   Group %s\n", a->mailbox);
     }
   }
-#endif
   mutt_group_context_destroy(&gc);
   return 0;
 
@@ -1965,12 +1963,13 @@ static void restore_default(struct Option *p)
     case DT_PATH:
       FREE((char **) p->data);
       char *init = NULL;
-#ifdef DEBUG
+
+
       if (mutt_strcmp(p->option, "debug_file") == 0 && debugfile_cmdline)
         init = debugfile_cmdline;
       else
-#endif
         init = (char *) p->init;
+
       if (init)
       {
         char path[_POSIX_PATH_MAX];
@@ -1996,11 +1995,9 @@ static void restore_default(struct Option *p)
     case DT_NUM:
     case DT_SORT:
     case DT_MAGIC:
-#ifdef DEBUG
       if (mutt_strcmp(p->option, "debug_level") == 0 && debuglevel_cmdline)
         *((short *) p->data) = debuglevel_cmdline;
       else
-#endif
         *((short *) p->data) = p->init;
       break;
     case DT_RX:
@@ -2167,7 +2164,6 @@ char **mutt_envlist(void)
   return envlist;
 }
 
-#ifdef DEBUG
 /**
  * start_debug - prepare the debugging file
  *
@@ -2233,7 +2229,6 @@ static void restart_debug(void)
   if (enable_debug || (file_changed && debuglevel > 0))
     start_debug();
 }
-#endif
 
 /* Helper function for parse_setenv().
  * It's broken out because some other parts of mutt (filter.c) need
@@ -2598,14 +2593,12 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
         }
         else if (DTYPE(MuttVars[idx].type) == DT_PATH)
         {
-#ifdef DEBUG
           if (mutt_strcmp(MuttVars[idx].option, "debug_file") == 0 && debugfile_cmdline)
           {
             mutt_message(_("set debug_file ignored, it have been overridden "
                            "with cmdline"));
             break;
           }
-#endif
           /* MuttVars[idx].data is already 'char**' (or some 'void**') or...
            * so cast to 'void*' is okay */
           FREE((void *) MuttVars[idx].data);
@@ -2613,10 +2606,9 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
           strfcpy(scratch, tmp->data, sizeof(scratch));
           mutt_expand_path(scratch, sizeof(scratch));
           *((char **) MuttVars[idx].data) = safe_strdup(scratch);
-#ifdef DEBUG
+
           if (mutt_strcmp(MuttVars[idx].option, "debug_file") == 0)
             restart_debug();
-#endif
         }
         else if (DTYPE(MuttVars[idx].type) == DT_STR)
         {
@@ -2775,14 +2767,12 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
         r = -1;
         break;
       }
-#ifdef DEBUG
       else if (mutt_strcmp(MuttVars[idx].option, "debug_level") == 0 && debuglevel_cmdline)
       {
         mutt_message(
             _("set debug_level ignored, it have been overridden with cmdline"));
         break;
       }
-#endif
       else
         *ptr = val;
 
@@ -2793,14 +2783,12 @@ static int parse_set(struct Buffer *tmp, struct Buffer *s, unsigned long data,
           *ptr = 0;
         mutt_init_history();
       }
-#ifdef DEBUG
       else if (mutt_strcmp(MuttVars[idx].option, "debug_level") == 0)
       {
         if (*ptr < 0)
           *ptr = 0;
         restart_debug();
       }
-#endif
       else if (mutt_strcmp(MuttVars[idx].option, "pager_index_lines") == 0)
       {
         if (*ptr < 0)
@@ -4000,7 +3988,14 @@ void mutt_init(int skip_sys_rc, struct List *commands)
     Shell = safe_strdup((p = getenv("SHELL")) ? p : "/bin/sh");
   }
 
-#ifdef DEBUG
+  /* Set standard defaults */
+  for (int i = 0; MuttVars[i].option; i++)
+  {
+    set_default(&MuttVars[i]);
+    restore_default(&MuttVars[i]);
+  }
+
+
   /* Start up debugging mode if requested from cmdline */
   if (debuglevel_cmdline > 0)
   {
@@ -4017,7 +4012,6 @@ void mutt_init(int skip_sys_rc, struct List *commands)
     }
     start_debug();
   }
-#endif
 
   /* And about the host... */
 
